@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import sqlite3
+from virus_simulation import infect_files
 
 app = Flask(__name__)
 
@@ -16,6 +17,16 @@ CREATE TABLE IF NOT EXISTS users (
 )
 ''')
 conn.commit()
+
+@app.route('/')
+def index():
+    return render_template("./index.html")
+
+@app.route("/simulate", methods=["POST"])
+def simulate_attack():
+    target_directory = "./target_directory"
+    infect_files(target_directory)
+    return jsonify({"message": "Educational virus executed!"})
 
 @app.route('/greet')
 def greet():
