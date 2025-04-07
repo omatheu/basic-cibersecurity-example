@@ -17,18 +17,24 @@ CREATE TABLE IF NOT EXISTS users (
 ''')
 conn.commit()
 
+@app.route('/greet')
+def greet():
+    name = request.args.get('name', '')
+    return f"<h1>Hello, {name}!</h1>"
+
 @app.route('/register', methods=['POST'])
 def register():
-    # NÃO há validação de entrada
     data = request.get_json()
     username = data['username']
     password = data['password']
-
-    # Vulnerável a SQL Injection
-    query = f"INSERT INTO users (username, password) VALUES ('{username}', '{password}')"
-    cursor.execute(query)
+    
+    # EXECUTA VÁRIAS INSTRUÇÕES (ALTAMENTE PERIGOSO)
+    query = f"""
+    INSERT INTO users (username, password) VALUES ('{username}', '{password}');
+    """
+    cursor.executescript(query)
     conn.commit()
-
+    
     return jsonify({"message": "User registered!"})
 
 @app.route('/login', methods=['POST'])
